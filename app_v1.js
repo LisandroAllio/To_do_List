@@ -1,20 +1,30 @@
 const todoForm = document.querySelector('form');
 const todoInput = document.getElementById("todo-input")
 const todoListUL = document.getElementById("todo-list")
+const cleanText = document.getElementById("clean-text")
 
-allTodos = [];
+let allTodos = [];
+
+// ----- EVENT FUNCTIONS -----
+document.addEventListener("DOMContentLoaded", function() {
+    if (localStorage.getItem("todos")) {
+        restoreTodos()
+    }
+})
 
 todoForm.addEventListener('submit', function(e){
     e.preventDefault();
     addTodo();
 })
 
+// ----- GENERAL FUNCTIONS -----
 function addTodo(){
     const todoText = todoInput.value.trim();
-    if (todoText.length > 0)
-        allTodos.push(todoText);
+    if (todoText.length > 0) {
+        allTodos.push([todoText, false]);
         updateTodoList();
-        todoInput.value = "";
+    }
+    todoInput.value = "";
 }
 
 function deleteTodo(index){
@@ -22,14 +32,38 @@ function deleteTodo(index){
     updateTodoList();
 }
 
+function markTodo(index){
+    !allTodos[index][1] ? allTodos[index][1] = true : allTodos[index][1] = false
+    updateTodoList()
+}
+
 function updateTodoList() {
     todoListUL.innerHTML = "";
     allTodos.forEach((todo, index) => {
-        todoItem = createTodoItem(todo, index);
+        todoItem = createTodoItem(todo[0], index);
+        
+        const deleteButton = todoItem.querySelector('.delete-button');
+        deleteButton.addEventListener('click', () => {
+            deleteTodo(index);
+        });
+    
+        const checkbox = todoItem.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function() {
+            markTodo(index);
+        });
+        if (todo[1]){
+            checkbox.checked = true;
+        }
+
         todoListUL.append(todoItem);
     });
+
+    allTodos.length != 0 ? cleanText.style.display = 'none' : 
+                            cleanText.style.display = 'flex';
+    savesTodos();
 }
 
+// ----- HTML FUNCTIONS -----
 function createTodoItem(todoText, todoIndex) {
     const todoId = "todo-" + todoIndex;
     const todoLi = document.createElement("li");
@@ -50,13 +84,16 @@ function createTodoItem(todoText, todoIndex) {
             </svg>
         </button>
     `;
-
-    const deleteButton = todoLi.querySelector('.delete-button');
-    deleteButton.addEventListener('click', () => {
-        deleteTodo(todoIndex);
-    });
-
     return todoLi;
 }
 
-todoListUL.addEventListener()
+//----- LOCAL STORAGE FUNCIONS -----
+function savesTodos(){
+    const todosJson = JSON.stringify(allTodos)
+    localStorage.setItem("todos", todosJson)
+}
+
+function restoreTodos(){
+    allTodos = JSON.parse(localStorage.getItem("todos"));
+    updateTodoList();
+}

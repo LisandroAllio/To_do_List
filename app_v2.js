@@ -1,20 +1,33 @@
 const todoForm = document.querySelector('form');
 const todoInput = document.getElementById("todo-input")
 const todoListUL = document.getElementById("todo-list")
+const cleanText = document.getElementById("clean-text")
 todoListUL.innerHTML = "";
+let todoList =[]
+
+document.addEventListener("DOMContentLoaded", function() {
+    if (localStorage.getItem("todos")) {
+        restoreTodos()
+    }
+})
 
 todoForm.addEventListener('submit', function(e){
     e.preventDefault();
     addTodo();
+    cleanText.style.display = 'none';
 })
 
 function addTodo(){
     const todoText = todoInput.value.trim();
-    if (todoText.length > 0)
+    if (todoText.length > 0) {
         index = todoListUL.children.length + 1
         todoItem = createTodoItem(todoText, index);
         todoListUL.append(todoItem);
-        todoInput.value = "";
+
+        todoList.push([index, todoText, false]);
+        updateTodos();
+        todoInput.value = "";   
+    }
 }
 
 function createTodoItem(todoText, todoIndex) {
@@ -41,9 +54,41 @@ function createTodoItem(todoText, todoIndex) {
     const deleteButton = todoLi.querySelector('.delete-button');
     deleteButton.addEventListener('click', () => {
         todoLi.remove()
+        const index = todoList.findIndex(todoItem => todoItem[0] == todoIndex)
+        todoList.splice(index, 1)
+        updateTodos()
+
+        if (todoListUL.children.length == 0){
+            cleanText.style.display = 'flex';
+        }
     });
+
+    const checkbox = todoLi.querySelector('input[type="checkbox"]');
+    checkbox.addEventListener('change', function() {
+        const index = todoList.findIndex(todoItem => todoItem[0] == todoIndex)
+        !todoList[index][2] ? todoList[index][2] = true : todoList[index][2] = false
+        updateTodos()
+    })
 
     return todoLi;
 }
 
-todoListUL.addEventListener()
+function updateTodos(){
+    const todosJson = JSON.stringify(todoList)
+    localStorage.setItem("todos", todosJson)
+}
+
+function restoreTodos(){
+    todoList = JSON.parse(localStorage.getItem("todos"))
+    if (todoList.length > 0){
+        todoList.forEach(Item => {
+            todoItem = createTodoItem(Item[1], Item[0]);
+            const checkbox = todoItem.querySelector('input[type="checkbox"]');
+            if (Item[2]) {
+                checkbox.checked = true; 
+            }
+            todoListUL.append(todoItem);
+        });
+        cleanText.style.display = 'none';
+    }
+}

@@ -7,6 +7,6 @@ The project is divided into three parts:
 - /icons: svg images for some icons
 - index: html file
 - style: css file
-- app_v1: first version of Javascript file (expired)
-- app_v2: actual version of Javascript file
+- app_v1: actual version of Javascript file 
+- app_v2: alternative and absolete version of Javascript file (expired)
 

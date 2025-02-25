@@ -114,6 +114,13 @@ input[type="checkbox"]{
     display: none;
 }
 
+#clean-text{
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    color: var(--secondary-color);
+}
+
 /*Responsive desing (para celulares)*/
 @media (max-width: 500px){
     html {
