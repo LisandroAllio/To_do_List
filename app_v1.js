@@ -48,13 +48,11 @@ function updateTodoList() {
         });
     
         const checkbox = todoItem.querySelector('input[type="checkbox"]');
+        checkbox.checked = todo[1]
         checkbox.addEventListener('change', function() {
             markTodo(index);
         });
-        if (todo[1]){
-            checkbox.checked = true;
-        }
-
+        
         todoListUL.append(todoItem);
     });
 
